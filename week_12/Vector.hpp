@@ -11,7 +11,7 @@ private:
 	size_t capacity = 0;
 
 	void copyFrom(const Vector<T>& other);
-	void moveFrom(const Vector<T>&& other);
+	void moveFrom(Vector<T>&& other);
 	void free();
 	void resize();
 
@@ -22,21 +22,21 @@ public:
 	Vector(const Vector <T>& other);
 	Vector<T>& operator=(const Vector<T>& other);
 
-	Vector(const Vector<T>&& other) noexcept;
-	Vector<T>& operator=(const Vector<T>&& other) noexcept;
+	Vector(Vector<T>&& other) noexcept;
+	Vector<T>& operator=(Vector<T>&& other) noexcept;
 
 	T& operator[](size_t index);
 	const T& operator[](size_t index) const;
 
 	~Vector() noexcept;
 
-	void push_back(Vector<T>& elem);
-	void push_back(Vector<T>&& elem) noexcept;
+	void push_back(const T& elem);
+	void push_back(const T&& elem) noexcept;
 
 	void pop_back();
 
-	void insert(const Vector<T>& elem, size_t index);
-	void insert(const Vector<T>&& elem, size_t index);
+	void insert(const T& elem, size_t index);
+	void insert(const T&& elem, size_t index);
 
 	void erase(size_t index);
 	void clear();
@@ -56,16 +56,16 @@ void Vector<T>::copyFrom(const Vector<T>& other)
 	capacity = other.capacity;
 }
 
-template <typename T>
-void Vector<T>::moveFrom(const Vector<T>&& other)
+template<class T>
+void Vector<T>::moveFrom(Vector<T>&& other)
 {
 	data = other.data;
 	other.data = nullptr;
 
 	size = other.size;
-	other.size = 0
+	other.size = 0;
 
-		capacity = other.capacity;
+	capacity = other.capacity;
 	other.capacity = 0;
 }
 
@@ -128,13 +128,13 @@ Vector<T>& Vector<T> :: operator=(const Vector<T>& other)
 }
 
 template <typename T>
-Vector<T> ::Vector(const Vector<T>&& other) noexcept
+Vector<T> ::Vector(Vector<T>&& other) noexcept
 {
 	moveFrom(std::move(other));
 }
 
 template <typename T>
-Vector<T>& Vector<T>::operator=(const Vector<T>&& other) noexcept
+Vector<T>& Vector<T>::operator=(Vector<T>&& other) noexcept
 {
 	if (this != &other)
 	{
@@ -167,19 +167,21 @@ Vector<T>::~Vector() noexcept
 }
 
 template <typename T>
-void Vector<T>::push_back(Vector<T>& elem)
+void Vector<T>::push_back(const T& elem)
 {
 	if (size == capacity)
 		resize();
-	data[size++] = elem;
+	size++;
+	data[size - 1] = elem;
 }
 
 template <typename T>
-void Vector<T>::push_back(Vector<T>&& elem) noexcept
+void Vector<T>::push_back(const T&& elem) noexcept
 {
 	if (size == capacity)
 		resize();
-	data[size++] = std::move(elem);
+	size++;
+	data[size - 1] = std::move(elem);
 }
 
 template <typename T>
@@ -191,7 +193,7 @@ void Vector<T>::pop_back()
 }
 
 template <typename T>
-void Vector<T>::insert(const Vector<T>& elem, size_t index)
+void Vector<T>::insert(const T& elem, size_t index)
 {
 	if (index >= size)
 		throw std::out_of_range("The index is out of range!");
@@ -207,7 +209,7 @@ void Vector<T>::insert(const Vector<T>& elem, size_t index)
 }
 
 template <typename T>
-void Vector<T>::insert(const Vector<T>&& elem, size_t index)
+void Vector<T>::insert(const T&& elem, size_t index)
 {
 	if (index >= size)
 		throw std::out_of_range("The index is out of range!");
